@@ -1,0 +1,43 @@
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://proxy.golang.org
+before:
+  hooks:
+    - go mod download
+    - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh
+
+builds:
+  - main: ./cmd/main.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ignore:'
+      - '^typo:'
+      - Merge pull request
+      - Merge branch
+
+archives:
+  - name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: '{{ .Version }}-{{ .ShortCommit }}'
+
+release:
+  prerelease: auto
